@@ -1,0 +1,82 @@
+# GITLAB
+# Maintainer: @randx
+# App Version: 5.0
+
+upstream gitlab {
+  server unix:<%= node['gitlab']['system_user']['home_dir'] %>/gitlab/tmp/sockets/gitlab.socket;
+}
+
+<% if !!node['gitlab']['http']['port'] %>
+server {
+  listen <%= node['gitlab']['http']['port'] %>;
+  server_name <%= node['gitlab']['http']['hostname'] %>;
+  root <%= node['gitlab']['system_user']['home_dir'] %>/gitlab/public;
+
+  <% if !!node['gitlab']['http']['secure_port'] && node['gitlab']['http']['force_https'] %>
+  <% if node['gitlab']['http']['secure_port']=="443" %>
+  rewrite ^ https://$server_name$request_uri? permanent;
+  <% else %>
+  rewrite ^ https://$server_name:<%= node['gitlab']['http']['secure_port'] %>$request_uri? permanent;
+  <% end %>
+  <% end %>
+
+  # individual nginx logs for this gitlab vhost
+  access_log  /var/log/nginx/gitlab_access.log;
+  error_log   /var/log/nginx/gitlab_error.log;
+
+  location <%= node['gitlab']['http']['path'] %> {
+    # serve static files from defined root folder;.
+    # @gitlab is a named location for the upstream fallback, see below
+    try_files $uri $uri/index.html $uri.html @gitlab;
+  }
+
+  # if a file, which is not found in the root folder is requested,
+  # then the proxy pass the request to the upsteam (gitlab unicorn)
+  location @gitlab {
+    proxy_read_timeout 300; # https://github.com/gitlabhq/gitlabhq/issues/694
+    proxy_connect_timeout 300; # https://github.com/gitlabhq/gitlabhq/issues/694
+    proxy_redirect     off;
+
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-Real-IP         $remote_addr;
+
+    proxy_pass http://gitlab;
+  }
+}
+<% end %>
+
+<% if !!node['gitlab']['http']['secure_port'] %>
+server {
+  listen <%= node['gitlab']['http']['secure_port'] %> default ssl;
+  server_name <%= node['gitlab']['http']['hostname'] %>;
+  root <%= node['gitlab']['system_user']['home_dir'] %>/gitlab/public;
+
+  ssl_certificate <%= node['gitlab']['http']['ssl_cert_path'] %>;
+  ssl_certificate_key <%= node['gitlab']['http']['ssl_key_path'] %>;
+
+  # individual nginx logs for this gitlab vhost
+  access_log  /var/log/nginx/gitlab_access.log;
+  error_log   /var/log/nginx/gitlab_error.log;
+
+  location <%= node['gitlab']['http']['path'] %> {
+    # serve static files from defined root folder;.
+    # @gitlab is a named location for the upstream fallback, see below
+    try_files $uri $uri/index.html $uri.html @gitlab;
+  }
+
+  # if a file, which is not found in the root folder is requested,
+  # then the proxy pass the request to the upsteam (gitlab unicorn)
+  location @gitlab {
+    proxy_read_timeout 300; # https://github.com/gitlabhq/gitlabhq/issues/694
+    proxy_connect_timeout 300; # https://github.com/gitlabhq/gitlabhq/issues/694
+    proxy_redirect     off;
+
+    proxy_set_header   X-Forwarded-Proto $scheme;
+    proxy_set_header   Host              $http_host;
+    proxy_set_header   X-Real-IP         $remote_addr;
+
+    proxy_pass http://gitlab;
+  }
+}
+<% end %>

@@ -1,0 +1,25 @@
+# GitLab user. git by default
+user: <%= node['gitlab']['system_user']['name'] %>
+
+# Url to gitlab instance. Used for api calls. Should be ends with slash.
+gitlab_url: "<%= GitLabURL::buildURL(node['gitlab']['http']) %>"
+
+http_settings:
+#  user: someone
+#  password: somepass
+  self_signed_cert: true
+
+# Repositories path
+# REPOS_PATH MUST NOT BE A SYMLINK!!!
+repos_path: "<%= node['gitlab']['system_user']['home_dir'] %>/repositories"
+
+# File used as authorized_keys for gitlab user
+auth_file: "<%= node['gitlab']['system_user']['home_dir'] %>/.ssh/authorized_keys"
+
+# Redis settings used for pushing commit notices to gitlab
+redis:
+  bin: /usr/bin/redis-cli
+  host: 127.0.0.1
+  port: 6379
+  # socket: /tmp/redis.socket # Only define this if you want to use sockets
+  namespace: resque:gitlab

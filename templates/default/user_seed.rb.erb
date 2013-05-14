@@ -1,0 +1,29 @@
+user = User.create(
+  email: "<%= @user['email'] %>",
+  name: "<%= @user['name'] %>",
+  username: "<%= @user['id'] %>"
+  password: "<%= @user['password'] %>",
+  password_confirmation: "<%= @user['password'] %>",
+  skype: "<%= @user['skype'] %>",
+  linkedin: "<%= @user['linkedin'] %>",
+  twitter: "<%= @user['twitter'] %>",
+  bio: "<%= @user['bio'] %>"
+)
+
+user.projects_limit = <%= @user['limit'] %>
+user.admin = <%= @user['admin'] %>
+user.save!
+
+<% if !!@user['keys'] %>
+<% @user['keys'].each do |key| %>
+key = user.keys.new({ :title => "<%= key['title'] %>", :key => "<%= key['key'] %>" })
+key.save
+<% end %>
+<% end %>
+
+
+if user.valid?
+puts %q[
+Account created: <%= @user['email'] %>
+]
+end
