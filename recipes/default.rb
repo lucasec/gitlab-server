@@ -125,7 +125,7 @@ end
 
 rvm_shell "gitlab-shell_install" do
 	ruby_string "1.9.3-p392@gitlab"
- 	user 		node['gitlab']['system_user']['name']
+	user 		node['gitlab']['system_user']['name']
 	group 		node['gitlab']['system_user']['group']
 	cwd         "#{node['gitlab']['system_user']['home_dir']}/gitlab-shell"
 	code        %{./bin/install && touch .gitlab-shell-install-done}
@@ -249,8 +249,12 @@ rvm_shell "bundle_install" do
 end
 
 # Create user database seeds
+ 
+default_users = [];
 
 if node['gitlab']['admin']['enable']
+	default_users.push("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/001_admin.rb")
+
 	# Override the default admin user seed
 	template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/001_admin.rb" do
 		source "user_seed.rb.erb"
@@ -275,18 +279,57 @@ else
 	end
 end
 
-if node['gitlab']['create_users']
-	search(:gitlab_users, '*:*') do |item|
-		user = Chef::EncryptedDataBagItem.load("gitlab_users", item[:id])
-		template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user['id']}.rb" do
-			source "user_seed.rb.erb"
-			mode 00600
-			owner node['gitlab']['system_user']['name']
-			group node['gitlab']['system_user']['group']
-			variables(
-				:user => user
-			)
+if node['gitlab']['default_users']
+	case node['gitlab']['default_users']['type']
+	when 'data bag'
+		# Load a secret key if specified
+		if !!node['gitlab']['default_users']['secret_key']
+			gitlab_secret = Chef::EncryptedDataBagItem.load_secret(node['gitlab']['default_users']['secret_key'])
 		end
+
+		# Search the data bag
+		search(node['gitlab']['default_users']['name'], '*:*') do |user|	
+
+			user = Chef::EncryptedDataBagItem.load(node['gitlab']['default_users']['name'], user[:id], 
+				gitlab_secret) if node['gitlab']['default_users']['encrypted']
+
+			default_users.push("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb")
+
+			template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb" do
+				source "user_seed.rb.erb"
+				mode 00600
+				owner node['gitlab']['system_user']['name']
+				group node['gitlab']['system_user']['group']
+				variables(
+					:user => user
+				)
+			end
+
+		end
+	when 'json'
+		node['gitlab']['default_users']['data'].each do |user|
+
+			default_users.push("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb")
+
+			template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb" do
+				source "user_seed.rb.erb"
+				mode 00600
+				owner node['gitlab']['system_user']['name']
+				group node['gitlab']['system_user']['group']
+				variables(
+					:user => user
+				)
+			end
+
+		end
+	end
+end
+
+# Remove any users besides the ones listed
+Dir.glob("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/*.rb") do |rb_file|
+	next if default_users.include? rb_file
+	file rb_file do
+		action :delete
 	end
 end
 

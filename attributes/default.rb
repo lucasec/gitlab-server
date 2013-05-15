@@ -24,7 +24,7 @@
 
 # [--- WEB SERVER ---]
 
-	default['gitlab']['http']['hostname'] = "localhost"
+	default['gitlab']['http']['hostname'] = fqdn
 	default['gitlab']['http']['path'] = "/"
 	default['gitlab']['http']['port'] = "80"
 	default['gitlab']['http']['secure_port'] = nil
@@ -67,9 +67,13 @@
 	default['gitlab']['admin']['email'] = "admin@local.host"
 	default['gitlab']['admin']['password'] = "5iveL!fe"
 
-	# GitLab can create other users from an encrypted data bag as well
-	# when using this feature, you may want to turn off the default admin
-	default['gitlab']['create_users'] = true
+	# GitLab can create other default users from a variety of sources
+	default['gitlab']['default_users'] = {:type => "data bag", :name => "gitlab_users", :encrypted => true}
+
+	# Default User Providers
+	# json provider:	{:type => "json", :data => []}
+	# databag provider	{:type => "data bag", :name => "data bag name", :encrypted => true/false,
+	# 					 :secret_file => "path-to-secret-key"}
 
 
 # ----------------------------
@@ -97,4 +101,9 @@
 		default['gitlab']['system_user']['home_dir'] = "/home/git"
 		default['gitlab']['system_user']['shell'] = nil
 	end
+
+# [--- REPO PATH ---]
+
+	# Repository directory
+	default['gitlab']['app']['repo_path'] = "#{node['gitlab']['system_user']['home_dir']}/repositories"
 
