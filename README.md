@@ -1,68 +1,160 @@
-gitlab-server Cookbook
+GitLab-Server Cookbook
 ======================
-TODO: Enter the cookbook description here.
 
-e.g.
-This cookbook makes your favorite breakfast sandwhich.
+Need a GitLab installation?  This cookbook has you covered.
 
-Requirements
+### Features:
+
+- Tested on Debian/Ubuntu and Amazon, should support others
+- Full installation including all necessary dependencies
+- Set up default users using attributes or an encrypted data bag
+- Easily customize http ports, ssl, database (use your own or let us install MySQL for you), paths, …
+
+Installation
 ------------
-TODO: List your cookbook requirements. Be sure to include any requirements this cookbook has on platforms, libraries, other cookbooks, packages, operating systems, etc.
 
-e.g.
-#### packages
-- `toaster` - gitlab-server needs toaster to brown your bagel.
-
-Attributes
-----------
-TODO: List you cookbook attributes here.
-
-e.g.
-#### gitlab-server::default
-<table>
-  <tr>
-    <th>Key</th>
-    <th>Type</th>
-    <th>Description</th>
-    <th>Default</th>
-  </tr>
-  <tr>
-    <td><tt>['gitlab-server']['bacon']</tt></td>
-    <td>Boolean</td>
-    <td>whether to include bacon</td>
-    <td><tt>true</tt></td>
-  </tr>
-</table>
+1. Download the cookbook
+2. Run `berks install` to gather dependencies
+3. Run `berks upload` to upload to your chef-server.  We do support chef-solo, no worries!
 
 Usage
 -----
-#### gitlab-server::default
-TODO: Write usage instructions for each cookbook.
 
-e.g.
-Just include `gitlab-server` in your node's `run_list`:
+We've tried to make this remarkably simple.
 
-```json
+For a basic install, just add `recipe[gitlab-server]` to your run list.
+
+Of course, you'll probably want to take a look at the various attributes that you can customize.  Jump in by loking at `attributes/default.rb`, which is well commented, or read the long form below.
+
+Attributes
+----------
+
+### Web Server
+
+#### Enable SSL (development)
+1. Enable the HTTPS server: `node['gitlab']['http']['secure_port'] = 443`
+2. Let us generate a self-signed SSL for you.
+3. Force-redirect to https: `node['gitlab']['http']['force_https'] = true`
+
+#### Enable SSL (production)
+1. Enable the HTTPS server: `node['gitlab']['http']['secure_port'] = 443`
+2. Use a method of your preference to install your SSL certs on the server.
+3. Point `node['gitlab']['http']['ssl_cert_path']` to your certificate and `node['gitlab']['http']['ssl_key_path']` to your private key.
+3. Force-redirect to https: `node['gitlab']['http']['force_https'] = true`
+
+#### Full set of HTTP attributes and their defaults
+- `node['gitlab']['http']['hostname'] = (fqdn)` - Your server's fully qualified domain name
+- `node['gitlab']['http']['path'] = "/)"` - Relative URL base, for example, specify "/gitlab" and your home page will be "http://your-domain/gitlab/"
+- `node['gitlab']['http']['port'] = "80"` - Bare HTTP port, set to nil to disable (i.e. you only want to run https on an obscure port)
+- `node['gitlab']['http']['secure_port'] = nil` - Secure HTTPS port, set this to enable SSL
+- `node['gitlab']['http']['force_https'] = false` - Immediately redirect bare HTTP requests to HTTPS
+- `node['gitlab']['http']['generate_ssl'] = true` - Generate a self-signed SSL certificate if none exists
+- `node['gitlab']['http']['ssl_cert_path'] = "/etc/ssl/certs/gitlab.crt"` - Path to SSL cert
+- `node['gitlab']['http']['ssl_key_path'] = "/etc/ssl/private/gitlab.key"` - Path to SSL private key
+
+### App Settings
+
+#### Email Addresses
+- `node['gitlab']['app']['system_email']` - System email address (notifications come from this)
+- `node['gitlab']['app']['support_email']` - Support email address displayed to users
+
+#### Default Users
+
+We offer a lot of ways to set up default users.
+
+##### Default Admin User:
+- `node['gitlab']['admin']['enable'] = true` - Disable if you don't want a default admin created (i.e. you're using one of the more flexible methods below)
+- `node['gitlab']['admin']['username'] = "root"` - Username
+- `node['gitlab']['admin']['name'] = "Administrator"` - Full name
+- `node['gitlab']['admin']['email'] = "admin@local.host"` - Email Address
+- `node['gitlab']['admin']['password'] = "5iveL!fe"` - Password
+
+##### Using Default User Providers
+
+GitLab-Server can create users from several sources.  These users are only used when initializing the database—they cannot be used to add users after the fact.
+
+Basic format for the User object:
+
+<pre>
 {
-  "name":"my_node",
-  "run_list": [
-    "recipe[gitlab-server]"
+  "id": "lucas",
+  "name": "Lucas Christian",
+  "email": "lucas@lucasec.com",
+  "password": "SuperSecurePassword",
+  "admin": true,
+  "limit": 100,
+  "keys": [
+    { "title": "[ssh key name here]", "key": "[paste ssh key here]" },
+    { "title": "[ssh key name 2 here]", "key": "[paste ssh key 2 here]" }
   ]
 }
-```
+</pre>
 
-Contributing
-------------
-TODO: (optional) If this is a public cookbook, detail the process for contributing. If this is a private cookbook, remove this section.
+  
 
-e.g.
-1. Fork the repository on Github
-2. Create a named feature branch (like `add_component_x`)
-3. Write you change
-4. Write tests for your change (if applicable)
-5. Run the tests, ensuring they all pass
-6. Submit a Pull Request using Github
+###### Encrypted Data Bag (best)
 
-License and Authors
--------------------
-Authors: TODO: List authors
+No configuration is necessary to use this in its default form.  Just create a encrypted data bag named `gitlab_users`.
+
+EDB Quick Start:
+
+1. Change to your chef_repo/.chef directory.
+2. Generate a secret key `openssl rand -base64 512 > encrypted_data_bag_secret`
+3. Tell knife.rb about your secret so it will push it out during bootstraps: `echo "encrypted_data_bag_secret '.chef/encrypted_data_bag_scret'" > knife.rb`
+4. Make your first user: `knife data bag create gitlab_users [new username here] --secret-file=encrypted_data_bag_secret`
+5. Enter the user's info into your text editor (see the format spec above), save, and close
+6. Done!  Start at step 4 to add additional users.
+
+You can customize this behavior a bit:
+
+- Use a different data bag name: `node['gitlab']['default_users'] = {:type => "data bag", :name => "[data bag name here]", :encrypted => true}`
+- Use a non-default encryption key: `{:type => "data bag", :name => "data bag name", :encrypted => true, :secret_file => "[path to secret key]"}`
+
+###### Regular Data Bag
+
+You can use a regular (non-encrypted) data bag as well.  Just set `:encrypted => false`.
+
+###### JSON Attribute
+
+You can also provide an array of default users in the attributes.  This approach can be used with chef-solo.
+
+Here's how: `node['gitlab']['default_users'] = {:type => "json", :data => [array of users (see format above)]}`
+
+### System Settings
+
+#### Repository Path
+
+You can specify a custom directory for the repositories folder.  This may be useful if you want to store the folder on a separate volume.
+
+- `node['gitlab']['app']['repo_path'] = "(home dir)/repositories"` - Repository folder.  This folder will be created if it does not exist, and permissions will be adjusted automatically.
+
+#### System User
+
+You can configure the system user that GitLab runs under.  Chef will make this user if it does not exist.
+
+- `node['gitlab']['system_user']['name'] = "git"` - System user name
+- `node['gitlab']['system_user']['group'] = "git"` - System group used for all GitLab files and the user
+- `node['gitlab']['system_user']['home_dir'] = "(platform specific)"` - Home Directory path
+- `node['gitlab']['system_user']['shell'] = "(platform specific)"` - Shell executable
+
+Notes
+-----
+
+GitLab-Server uses the Nginx cookbook.  By default, it will create its own site and *disable the default site*.  If you want to override this behavior, just sepcify `node['nginx']['default_site_enabled'] = true`.
+
+Build-essential is set to run at complie time in order to satisfy the MySQL cookbook.  If your attributes override this, the run may fail.
+
+Roadmap
+-------
+
+We've got a few features planned:
+
+- GitLab CI recipe
+- Backup configuration and scheduling
+
+License & Authors
+-----------------
+
+Author: Lucas Christian, lucas@lucasec.com
+
+Copyright 2012 Lucas Christian
