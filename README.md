@@ -75,22 +75,19 @@ GitLab-Server can create users from several sources.  These users are only used 
 
 Basic format for the User object:
 
-<pre>
-{
-  "id": "lucas",
-  "name": "Lucas Christian",
-  "email": "lucas@lucasec.com",
-  "password": "SuperSecurePassword",
-  "admin": true,
-  "limit": 100,
-  "keys": [
-    { "title": "[ssh key name here]", "key": "[paste ssh key here]" },
-    { "title": "[ssh key name 2 here]", "key": "[paste ssh key 2 here]" }
-  ]
-}
-</pre>
-
-  
+    {
+      "id": "lucas",
+      "name": "Lucas Christian",
+      "email": "lucas@lucasec.com",
+      "password": "SuperSecurePassword",
+      "admin": true,
+      "limit": 100,
+      "keys": [
+        { "title": "[ssh key name here]", "key": "[paste ssh key here]" },
+        { "title": "[ssh key name 2 here]", "key": "[paste ssh key 2 here]" }
+      ]
+    }
+ 
 
 ###### Encrypted Data Bag (best)
 
