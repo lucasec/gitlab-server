@@ -94,6 +94,11 @@ status() {
   fi
 }
 
+backup() {
+  cd $APP_ROOT
+  execute "RAILS_ENV=production bundle exec rake gitlab:backup:create"
+}
+
 ## Check to see if we are running as root first.
 ## Found at http://www.cyberciti.biz/tips/shell-root-user-check-script.html
 if [ "$(id -u)" != "0" ]; then
@@ -118,6 +123,9 @@ case "$1" in
         ;;
   status)
         status
+        ;;
+  backup)
+        backup
         ;;
   *)
         echo "Usage: service gitlab {start|stop|restart|reload}" >&2

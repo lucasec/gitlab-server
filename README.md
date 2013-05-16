@@ -125,6 +125,19 @@ You can specify a custom directory for the repositories folder.  This may be use
 
 - `node['gitlab']['app']['repo_path'] = "(home dir)/repositories"` - Repository folder.  This folder will be created if it does not exist, and permissions will be adjusted automatically.
 
+#### Automatic Backups
+
+GitLab-Server can run automatic backups for you using cron.
+
+Backups are configured by default to be saved in `(home dir)/backups` and kept for 30 days.  Of course, you can change this.
+
+- `node['gitlab']['backup']['path'] = "(home dir)/backups"` - The folder that GitLab will store backups in.
+-  `node['gitlab']['backup']['keep_for'] = '30d'` - How long backups should be kept.  Use this friendly syntax: `10d 12h 5m` would run backups every 10 days, 12 hours, and 5 minutes.  No calculator necessary.
+
+Backups can be run at any time by running `service gitlab backup` as root.  You can also schedule this using cron.
+
+- `node['gitlab']['backup']['run'] = "manually"` - Specify when the backup should run.  This can either be set to "manually" or a crontab-style time string (min hour day month weekday).  For example, `0 0 * * *` will run the job daily (at the zero hour and zero minute).
+
 #### System User
 
 You can configure the system user that GitLab runs under.  Chef will make this user if it does not exist.

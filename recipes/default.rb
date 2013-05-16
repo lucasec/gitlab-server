@@ -198,10 +198,11 @@ end
 	"#{node['gitlab']['system_user']['home_dir']}/gitlab/tmp/pids",
 	"#{node['gitlab']['system_user']['home_dir']}/gitlab/tmp/sockets",
 	"#{node['gitlab']['system_user']['home_dir']}/gitlab/public/uploads",
-	"#{node['gitlab']['system_user']['home_dir']}/gitlab-satellites" ].each do |dir|
+	"#{node['gitlab']['system_user']['home_dir']}/gitlab-satellites",
+	"#{node['gitlab']['backup']['path']}" ].each do |dir|
 	directory dir do
 		owner node['gitlab']['system_user']['name']
-	group node['gitlab']['system_user']['group']
+		group node['gitlab']['system_user']['group']
 		mode  00755
 	end
 end
@@ -354,6 +355,33 @@ end
 service "gitlab" do
 	supports :status => true, :restart => true, :reload => true
 	action [ :enable, :start ]
+end
+
+# Schedule backups with cron (if enabled)
+if node['gitlab']['backup']['run'] == "manually"
+	# Delete any existing cron job
+	cron "gitlab-backup-cron" do
+		action :delete
+	end
+else
+	# Create logfiles and set proper perms
+	[ "#{node['gitlab']['system_user']['home_dir']}/gitlab/log/backup.stdout.log",
+	  "#{node['gitlab']['system_user']['home_dir']}/gitlab/log/backup.stderr.log" ].each do |logfile|
+	  	file logfile do
+	  		owner node['gitlab']['system_user']['name']
+			group node['gitlab']['system_user']['group']
+			mode 00644
+		end
+	end
+	# Schedule the cron job
+	cron "gitlab-backup-cron" do
+		command		"/etc/init.d/gitlab backup 1> #{node['gitlab']['system_user']['home_dir']}/gitlab/log/backup.stdout.log 2> #{node['gitlab']['system_user']['home_dir']}/gitlab/log/backup.stderr.log"
+		minute 		node['gitlab']['backup']['run'].split(' ')[0]
+		hour		node['gitlab']['backup']['run'].split(' ')[1]
+		day			node['gitlab']['backup']['run'].split(' ')[2]
+		month		node['gitlab']['backup']['run'].split(' ')[3]
+		weekday		node['gitlab']['backup']['run'].split(' ')[4]
+	end
 end
 
 

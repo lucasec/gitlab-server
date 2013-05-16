@@ -107,3 +107,16 @@
 	# Repository directory
 	default['gitlab']['app']['repo_path'] = "#{node['gitlab']['system_user']['home_dir']}/repositories"
 
+# [--- BACKUPS ---]
+
+	# Path in which to store backups
+	default['gitlab']['backup']['path'] = "#{node['gitlab']['system_user']['home_dir']}/backups"
+
+	# How long should the backups be kept?  Spceify a relative time string (i.e. "30d 5h" for 30 days and 5 hours)
+	# You can also specify "forever"
+	default['gitlab']['backup']['keep_for'] = "30d"
+
+	# When should the backup run?
+	# Specify "manually" or a cron string (min hour day month weekday)
+	default['gitlab']['backup']['run'] = "manually"
+
