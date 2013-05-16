@@ -97,8 +97,6 @@ To get started, set the following attribute and then follow the steps below to c
 
 EDB Quick Start:
 
-Enable the default setup by setting 
-
 1. Change to your chef_repo/.chef directory.
 2. Generate a secret key `openssl rand -base64 512 > encrypted_data_bag_secret`
 3. Tell knife.rb about your secret so it will push it out during bootstraps: `echo "encrypted_data_bag_secret '.chef/encrypted_data_bag_scret'" > knife.rb`
