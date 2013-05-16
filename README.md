@@ -162,7 +162,7 @@ We've got a few features planned:
 - GitLab CI recipe
 - Backup configuration and scheduling
 
-License & Authors
+License and Authors
 -----------------
 
 Author: Lucas Christian, lucas@lucasec.com
