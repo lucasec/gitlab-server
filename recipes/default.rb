@@ -280,49 +280,47 @@ else
 	end
 end
 
-if node['gitlab']['default_users']
-	case node['gitlab']['default_users']['type']
-	when 'data bag'
-		# Load a secret key if specified
-		if !!node['gitlab']['default_users']['secret_key']
-			gitlab_secret = Chef::EncryptedDataBagItem.load_secret(node['gitlab']['default_users']['secret_key'])
+case node['gitlab']['default_users']['type']
+when 'data bag'
+
+	# Load a secret key if specified
+	if !!node['gitlab']['default_users']['secret_file']
+		gitlab_secret = Chef::EncryptedDataBagItem.load_secret(node['gitlab']['default_users']['secret_file'])
+	end
+
+	# Search the data bag
+	search(node['gitlab']['default_users']['name'], '*:*') do |user|	
+		user = Chef::EncryptedDataBagItem.load(node['gitlab']['default_users']['name'], user['id'], 
+			gitlab_secret) if node['gitlab']['default_users']['encrypted']
+
+		default_users.push("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user['id']}.rb")
+
+		template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user['id']}.rb" do
+			source "user_seed.rb.erb"
+			mode 00600
+			owner node['gitlab']['system_user']['name']
+			group node['gitlab']['system_user']['group']
+			variables(
+				:user => user
+			)
 		end
 
-		# Search the data bag
-		search(node['gitlab']['default_users']['name'], '*:*') do |user|	
+	end
+when 'json'
+	node['gitlab']['default_users']['data'].each do |user|
 
-			user = Chef::EncryptedDataBagItem.load(node['gitlab']['default_users']['name'], user[:id], 
-				gitlab_secret) if node['gitlab']['default_users']['encrypted']
+		default_users.push("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user['id']}.rb")
 
-			default_users.push("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb")
-
-			template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb" do
-				source "user_seed.rb.erb"
-				mode 00600
-				owner node['gitlab']['system_user']['name']
-				group node['gitlab']['system_user']['group']
-				variables(
-					:user => user
-				)
-			end
-
+		template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user['id']}.rb" do
+			source "user_seed.rb.erb"
+			mode 00600
+			owner node['gitlab']['system_user']['name']
+			group node['gitlab']['system_user']['group']
+			variables(
+				:user => user
+			)
 		end
-	when 'json'
-		node['gitlab']['default_users']['data'].each do |user|
 
-			default_users.push("#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb")
-
-			template "#{node['gitlab']['system_user']['home_dir']}/gitlab/db/fixtures/production/#{user[:id]}.rb" do
-				source "user_seed.rb.erb"
-				mode 00600
-				owner node['gitlab']['system_user']['name']
-				group node['gitlab']['system_user']['group']
-				variables(
-					:user => user
-				)
-			end
-
-		end
 	end
 end
 
