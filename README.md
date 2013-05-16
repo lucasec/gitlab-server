@@ -91,9 +91,13 @@ Basic format for the User object:
 
 ###### Encrypted Data Bag (best)
 
-No configuration is necessary to use this in its default form.  Just create a encrypted data bag named `gitlab_users`.
+Encrypted Data Bags allow you to securely store a set of default usernames, passwords, and even SSH Keys!
+
+To get started, set the following attribute and then follow the steps below to create your data bag: `node['gitlab']['default_users'] = {:type => "data bag", :name => "gitlab_users", :encrypted => true}`
 
 EDB Quick Start:
+
+Enable the default setup by setting 
 
 1. Change to your chef_repo/.chef directory.
 2. Generate a secret key `openssl rand -base64 512 > encrypted_data_bag_secret`
@@ -105,7 +109,7 @@ EDB Quick Start:
 You can customize this behavior a bit:
 
 - Use a different data bag name: `node['gitlab']['default_users'] = {:type => "data bag", :name => "[data bag name here]", :encrypted => true}`
-- Use a non-default encryption key: `{:type => "data bag", :name => "data bag name", :encrypted => true, :secret_file => "[path to secret key]"}`
+- Use a non-default encryption key: `{:type => "data bag", :name => "data bag name", :encrypted => true, :secret_file => "path-to-secret-key"}`
 
 ###### Regular Data Bag
 

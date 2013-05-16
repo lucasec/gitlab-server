@@ -68,11 +68,14 @@
 	default['gitlab']['admin']['password'] = "5iveL!fe"
 
 	# GitLab can create other default users from a variety of sources
-	default['gitlab']['default_users'] = {:type => "data bag", :name => "gitlab_users", :encrypted => true}
+	default['gitlab']['default_users'] = {:type => "none"}
 
 	# Default User Providers
+	# none provider:	{:type => "none" }
 	# json provider:	{:type => "json", :data => []}
-	# databag provider	{:type => "data bag", :name => "data bag name", :encrypted => true/false,
+	# databag provider	{:type => "data bag", :name => "data bag name"}
+	# 					{:type => "data bag", :name => "data bag name", :encrypted => true}
+	# 	more options..	{:type => "data bag", :name => "data bag name", :encrypted => true,
 	# 					 :secret_file => "path-to-secret-key"}
 
 
