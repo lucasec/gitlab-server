@@ -37,8 +37,8 @@
 # [--- DATABASE ---]
 
 	# Automatic Configuration Management
-	default['gitlab']['database']['manage-install'] = true	# Install MySQL
-	default['gitlab']['database']['manage-database'] = true	# Create Database
+	default['gitlab']['database']['manage_install'] = true	# Install MySQL
+	default['gitlab']['database']['manage_database'] = true	# Create Database
 
 	# Database Connection
 	default['gitlab']['database']['hostname'] = "localhost"
@@ -47,7 +47,7 @@
 
 	# Database Root Password (only needed if using manage-database
 	# without manage-install)
-	# default['gitlab']['database']['root-password'] = "gitlab"
+	# default['gitlab']['database']['root_password'] = "gitlab"
 
 	# Database User Password (if not specified, will be generated)
 	# default['gitlab']['database']['password'] = "gitlab"

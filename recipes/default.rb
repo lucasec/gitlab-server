@@ -140,20 +140,20 @@ end
 # Stage 6: Database
 # ----------------------------
 
-if node['gitlab']['database']['manage-install']
+if node['gitlab']['database']['manage_install']
 	# Database install
 	include_recipe "mysql::server"
 end
 
-if node['gitlab']['database']['manage-database']
+if node['gitlab']['database']['manage_database']
 	include_recipe "database::mysql"
 
 	database_connection = {
 	  :host     => node['gitlab']['database']['hostname'],
 	  :username => 'root',
-	  :password => node['gitlab']['database']['root-password'].nil? ? 
+	  :password => node['gitlab']['database']['root_password'].nil? ? 
 	               node['mysql']['server_root_password'] : 
-	               node['gitlab']['database']['root-password']
+	               node['gitlab']['database']['root_password']
 	}
 
 	# Create the database
