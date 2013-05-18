@@ -186,13 +186,24 @@ GitLab-Server uses the Nginx cookbook.  By default, it will create its own site 
 
 Build-essential is set to run at complie time in order to satisfy the MySQL cookbook.  If your attributes override this, the run may fail.
 
+### Chef-Solo Usage
+
+GitLab-Server works fine with Chef-Solo, except the recipe cannot use automatic password generation when setting up a database for you. Make sure you give us a password in your JSON:
+
+    {
+      "gitlab": {
+        "database": {
+          "password": "[your secure password here]"
+        }
+      }
+    }
+
 Roadmap
 -------
 
 We've got a few features planned:
 
 - GitLab CI recipe
-- Backup configuration and scheduling
 
 License and Authors
 -----------------
