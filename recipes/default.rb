@@ -27,7 +27,9 @@ else
 		libxslt-devel libcurl-devel libicu-devel }
 end
 
-include_recipe 'yum::epel' if node['platform'] = 'centos'
+if platform_family?("rhel")
+	include_recipe "yum::epel"
+end
 
 packages.each do |requirement|
 	package requirement
