@@ -54,7 +54,33 @@ Attributes
 
 ### Database
 
-TODO
+GitLab uses the MySQL recipe to automatically install a database for you. If you've already got a database, you probably want to override this.
+
+#### Use your own database server
+
+You can use your own MySQL installation on another server, but still let us create a database and user for you.
+
+1. Tell GitLab-Server not to install MySQL for you: `node['gitlab']['database']['manage_install'] = false`
+2. Tell GitLab-Server your database host and root (or any user that can create databases) password:
+	- `node['gitlab']['database']['hostname'] = "[your hostname]"`
+	- Override `node['gitlab']['database']['port']` if necessary
+	- Override `node['gitlab']['database']['root_user']` if your user is not named 'root'
+	- `node['gitlab']['database']['root_password'] = "[your database root password]"`
+3. Customize the name of the database and user the cookbook will create:
+	- `node['gitlab']['database']['database'] = "gitlabhq_production"`
+	- `node['gitlab']['database']['username'] = "gitlab"`
+
+#### Use an existing database on your own server
+
+1. Tell GitLab-Server not to install MySQL for you: `node['gitlab']['database']['manage_install'] = false`.
+2. Tell GitLab-Server not to create a database for you: `node['gitlab']['database']['manage_database'] = false`.
+2. Tell GitLab-Server your database host:
+	- `node['gitlab']['database']['hostname'] = "[your hostname]"`
+	- Override `node['gitlab']['database']['port']` if necessary
+3. Provide us the database name and a user with permission to it:
+	- `node['gitlab']['database']['database'] = "[database name]"`
+	- `node['gitlab']['database']['username'] = "[username]"`
+	- `node['gitlab']['database']['password'] = "[password]"`
 
 ### App Settings
 
