@@ -52,6 +52,10 @@ Attributes
 - `node['gitlab']['http']['ssl_cert_path'] = "/etc/ssl/certs/gitlab.crt"` - Path to SSL cert
 - `node['gitlab']['http']['ssl_key_path'] = "/etc/ssl/private/gitlab.key"` - Path to SSL private key
 
+### Database
+
+TODO
+
 ### App Settings
 
 #### Email Addresses
