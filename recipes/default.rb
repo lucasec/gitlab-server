@@ -399,6 +399,8 @@ end
 
 # Generate an SSL Cert if necessary
 bash "generate-ssl-cert" do
+	only_if		{ node['gitlab']['http']['generate_ssl'] }
+	not_if		{ node['gitlab']['http']['secure_port'].nil? }
 	code <<-EOH
 (
 echo "US"
@@ -413,7 +415,7 @@ echo
 )|
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout #{node['gitlab']['http']['ssl_key_path']} -out #{node['gitlab']['http']['ssl_cert_path']}
 EOH
-	creates node['gitlab']['http']['ssl_cert_path']
+	creates 	node['gitlab']['http']['ssl_cert_path']
 end
 
 # Enable gitlab site
