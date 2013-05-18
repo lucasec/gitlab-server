@@ -40,7 +40,7 @@ check_pid(){
 }
 
 execute() {
-  sudo -u $APP_USER -H bash -l -c "source <%= node['rvm']['root_path'] + "/environments/" + @ruby_string_exact %> && $1"
+  su $APP_USER -c "source <%= node['rvm']['root_path'] + "/environments/" + @ruby_string_exact %> && $1"
 }
 
 start() {
