@@ -42,11 +42,15 @@
 
 	# Database Connection
 	default['gitlab']['database']['hostname'] = "localhost"
+	default['gitlab']['database']['port'] = 3306
 	default['gitlab']['database']['database'] = "gitlabhq_production"
 	default['gitlab']['database']['username'] = "gitlab"
 
-	# Database Root Password (only needed if using manage-database
-	# without manage-install)
+	# Database Root User (used with manage_database)
+	default['gitlab']['database']['root_user'] = "root"
+
+	# Database Root Password (only needed if using manage_database
+	# without manage_install)
 	# default['gitlab']['database']['root_password'] = "gitlab"
 
 	# Database User Password (if not specified, will be generated)

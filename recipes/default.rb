@@ -150,7 +150,8 @@ if node['gitlab']['database']['manage_database']
 
 	database_connection = {
 	  :host     => node['gitlab']['database']['hostname'],
-	  :username => 'root',
+	  :port     => node['gitlab']['database']['port'],
+	  :username => node['gitlab']['database']['root_user'],
 	  :password => node['gitlab']['database']['root_password'].nil? ? 
 	               node['mysql']['server_root_password'] : 
 	               node['gitlab']['database']['root_password']
