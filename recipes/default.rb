@@ -164,12 +164,7 @@ if node['gitlab']['database']['manage-database']
 	if node['gitlab']['database']['password'].nil?
 		::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
 		node.set['gitlab']['database']['password'] = secure_password
-		ruby_block "save node data" do
-			block do
-		    	node.save
-			end
-			not_if { Chef::Config[:solo] }
-		end
+		node.save unless Chef::Config[:solo]
 	end
 
 	# Create the database user
@@ -359,9 +354,14 @@ end
 
 # Schedule backups with cron (if enabled)
 if node['gitlab']['backup']['run'] == "manually"
-	# Delete any existing cron job
-	cron "gitlab-backup-cron" do
-		action :delete
+	if ::File.exists?("#{node['gitlab']['system_user']['home_dir']}/gitlab/.backup_scheduled")
+		# Delete any existing cron job
+		cron "gitlab-backup-cron" do
+			action :delete
+		end
+		file "#{node['gitlab']['system_user']['home_dir']}/gitlab/.backup_scheduled" do
+			action :delete
+		end
 	end
 else
 	# Create logfiles and set proper perms
@@ -381,6 +381,11 @@ else
 		day			node['gitlab']['backup']['run'].split(' ')[2]
 		month		node['gitlab']['backup']['run'].split(' ')[3]
 		weekday		node['gitlab']['backup']['run'].split(' ')[4]
+	end
+	# Create status file
+	file "#{node['gitlab']['system_user']['home_dir']}/gitlab/.backup_scheduled" do
+		owner node['gitlab']['system_user']['name']
+		group node['gitlab']['system_user']['group']
 	end
 end
 
