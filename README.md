@@ -203,6 +203,7 @@ Roadmap
 
 We've got a few features planned:
 
+- Spliting main recipe into smaller recipes
 - GitLab CI recipe
 
 License and Authors
