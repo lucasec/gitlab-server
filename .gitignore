@@ -1,3 +1,4 @@
+.kitchen
 .vagrant
 Berksfile.lock
 *~
@@ -16,4 +17,4 @@ bin/*
 *.sublime-project
 *.sublime-workspace
 *.TODO
-*.todo/.kitchen
+*.todo
