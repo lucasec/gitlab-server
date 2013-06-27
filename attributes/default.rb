@@ -32,6 +32,11 @@
 # Essentials
 # ----------------------------
 
+# [--- TUNABLES ---]
+
+	default['gitlab']['branch'] = '5-3-stable'
+	default['gitlab']['ruby_version'] = '1.9.3-p429'
+
 # [--- WEB SERVER ---]
 
 	default['gitlab']['http']['hostname'] = fqdn
