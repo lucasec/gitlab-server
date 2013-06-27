@@ -51,6 +51,9 @@ Vagrant.configure("2") do |config|
   #
   # View the documentation for the provider you're using for more
   # information on available options.
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "768"]
+  end
 
   config.ssh.max_tries = 40
   config.ssh.timeout   = 120
