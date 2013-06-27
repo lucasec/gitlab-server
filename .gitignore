@@ -16,4 +16,4 @@ bin/*
 *.sublime-project
 *.sublime-workspace
 *.TODO
-*.todo
+*.todo/.kitchen
