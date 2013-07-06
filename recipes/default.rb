@@ -55,14 +55,14 @@ include_recipe 'python'
 # Set up Ruby
 include_recipe 'rvm::system_install'
 
-rvm_environment 'ruby-1.9.3-p392@gitlab'
+rvm_environment "ruby-#{node['gitlab']['ruby_version']}@gitlab"
 
 rvm_gem 'bundler' do
-	ruby_string "1.9.3-p392@gitlab"
+	ruby_string "#{node['gitlab']['ruby_version']}@gitlab"
 end
 
 rvm_gem 'charlock_holmes' do
-	ruby_string "1.9.3-p392@gitlab"
+	ruby_string "#{node['gitlab']['ruby_version']}@gitlab"
 	version '0.6.9.4'
 end
 
@@ -113,7 +113,7 @@ file "#{node['gitlab']['system_user']['home_dir']}/.bashrc" do
 	user node['gitlab']['system_user']['name']
 	group node['gitlab']['system_user']['group']
 	content <<-EOH
-source #{node['rvm']['root_path'] + "/environments/" + "ruby-1.9.3-p392@gitlab"}
+source #{node['rvm']['root_path'] + "/environments/" + "ruby-#{node['gitlab']['ruby_version']}@gitlab"}
 EOH
 	mode 00664
 end
@@ -138,7 +138,7 @@ template "#{node['gitlab']['system_user']['home_dir']}/gitlab-shell/config.yml" 
 end
 
 rvm_shell "gitlab-shell_install" do
-	ruby_string "1.9.3-p392@gitlab"
+	ruby_string "#{node['gitlab']['ruby_version']}@gitlab"
 	user 		node['gitlab']['system_user']['name']
 	group 		node['gitlab']['system_user']['group']
 	cwd         "#{node['gitlab']['system_user']['home_dir']}/gitlab-shell"
@@ -197,7 +197,7 @@ end
 # Clone GitLab
 git "#{node['gitlab']['system_user']['home_dir']}/gitlab" do
 	repository "https://github.com/gitlabhq/gitlabhq.git"
-	reference "5-1-stable"
+	reference node['gitlab']['branch']
 	user node['gitlab']['system_user']['name']
 	group node['gitlab']['system_user']['group']
 	action :checkout
@@ -251,7 +251,7 @@ end
 
 # Install gem bundles and init database
 rvm_shell "bundle_install" do
-	ruby_string "1.9.3-p392@gitlab"
+	ruby_string "#{node['gitlab']['ruby_version']}@gitlab"
 	user 		node['gitlab']['system_user']['name']
 	group 		node['gitlab']['system_user']['group']
 	cwd         "#{node['gitlab']['system_user']['home_dir']}/gitlab"
@@ -345,7 +345,7 @@ end
 # Run setup
 
 rvm_shell "gitlab_do_setup" do
-	ruby_string "1.9.3-p392@gitlab"
+	ruby_string "#{node['gitlab']['ruby_version']}@gitlab"
 	user node['gitlab']['system_user']['name']
 	group node['gitlab']['system_user']['group']
 	cwd         "#{node['gitlab']['system_user']['home_dir']}/gitlab"
@@ -356,7 +356,7 @@ end
 # Install init.d script
 template "/etc/init.d/gitlab" do
 	source "gitlab.init.erb"
-	variables( :ruby_string_exact => "ruby-1.9.3-p392@gitlab" )
+	variables( :ruby_string_exact => "ruby-#{node['gitlab']['ruby_version']}@gitlab" )
 	mode 00777
 end
 
