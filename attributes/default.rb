@@ -32,9 +32,10 @@
 # Essentials
 # ----------------------------
 
-# [--- TUNABLES ---]
+# [--- VERSIONS ---]
 
 	default['gitlab']['branch'] = '5-3-stable'
+	default['gitlab']['shell_branch'] = 'master'
 	default['gitlab']['ruby_version'] = '1.9.3-p429'
 
 # [--- WEB SERVER ---]

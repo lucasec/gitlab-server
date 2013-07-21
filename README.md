@@ -179,6 +179,12 @@ You can configure the system user that GitLab runs under.  Chef will make this u
 - `node['gitlab']['system_user']['home_dir'] = "(platform specific)"` - Home Directory path
 - `node['gitlab']['system_user']['shell'] = "(platform specific)"` - Shell executable
 
+### Versions
+
+- `node['gitlab']['ruby_version']` - Ruby version to use (in an RVM string)
+- `node['gitlab']['branch']` - Branch from the main Gitlab repository to use
+- `node['gitlab']['shell_branch']` - Branch of Gitlab-Shell to use
+
 Notes
 -----
 
