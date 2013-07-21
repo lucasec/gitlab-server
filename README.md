@@ -181,6 +181,8 @@ You can configure the system user that GitLab runs under.  Chef will make this u
 
 ### Versions
 
+You can change the versions of ruby, gitlab, and gitlab-shell installed by the cookbook.  As long as the installation process does not change, you can update to newer versions of Gitlab independently from this cookbook.
+
 - `node['gitlab']['ruby_version']` - Ruby version to use (in an RVM string)
 - `node['gitlab']['branch']` - Branch from the main Gitlab repository to use
 - `node['gitlab']['shell_branch']` - Branch of Gitlab-Shell to use
