@@ -20,7 +20,7 @@ production: &base
               node['gitlab']['http']['port'] : 
               node['gitlab']['http']['secure_port'] %>
 
-    https: <%= node['gitlab']['http']['secure_port'].nil? ? "false" : "ture" %>
+    https: <%= node['gitlab']['http']['secure_port'].nil? ? "false" : "true" %>
 
     <% if node['gitlab']['http']['path']!="/" %>
     # Uncomment and customize to run in non-root path
