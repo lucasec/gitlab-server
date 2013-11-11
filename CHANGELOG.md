@@ -2,6 +2,10 @@
 
 This file is used to list changes made in each version of gitlab-server.
 
+## 1.0.2:
+
+* Interim release for the Opscode Community Site.  Fixes issues with Community Site metadata.  This release does not affect the functionality of the cookbook.
+
 ## 1.0.1:
 
 * Introduces attributes to alter the versions of ruby, gitlab, and gitlab-shell

@@ -13,9 +13,20 @@ Need a GitLab installation?  This cookbook has you covered.
 Installation
 ------------
 
-1. Download the cookbook
+### From GitHub Repo
+
+1. Download the cookbook (`git clone git@github.com:lucasec/gitlab-server.git`)
+2. Enter the cookbook directory (`cd gitlab-server`)
 2. Run `berks install` to gather dependencies
 3. Run `berks upload` to upload to your chef-server.  We do support chef-solo, no worries!
+
+### From Opscode Community Site
+
+1. Download the cookbook (`knife cookbook site install gitlab-server`)
+2. Download the RVM cookbook (`git clone git@github.com:fnichol/chef-rvm.git`)
+3. Upload the cookbook and dependencies to your server
+
+Note that the Opscode Site version does not contain Vagrant and Berkshelf configurations. If you prefer the Vagrant/Berkshelf workflow, download the cookbook from its [official repository](https://github.com/lucasec/gitlab-server).
 
 Usage
 -----
