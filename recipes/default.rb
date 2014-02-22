@@ -38,7 +38,7 @@ else
 end
 
 if platform_family?("rhel")
-	include_recipe "yum::epel"
+	include_recipe "yum-epel"
 end
 
 packages.each do |requirement|
