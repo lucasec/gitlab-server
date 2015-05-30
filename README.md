@@ -1,6 +1,8 @@
 GitLab-Server Cookbook
 ======================
 
+**Note: This cookbook is no longer maintained, as the GitLab team now maintains their own Chef cookbooks as part of Omnibus-GitLab.**
+
 Need a GitLab installation?  This cookbook has you covered.
 
 ### Features:
